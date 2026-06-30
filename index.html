@@ -21,13 +21,12 @@
   <!-- ── REEMPLAZA con tu firebaseConfig real ── -->
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyCJydzaGFuAf1flRw0SpywIXLFHkNkrSyo",
-    authDomain: "rossdelune-demo.firebaseapp.com",
-    projectId: "rossdelune-demo",
-    storageBucket: "rossdelune-demo.firebasestorage.app",
-    messagingSenderId: "779354791081",
-    appId: "1:779354791081:web:4fe3b6fcb3dbcc42495db8",
-    measurementId: "G-058056DKSK"
+      apiKey:            "REEMPLAZAR_API_KEY",
+      authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+      projectId:         "REEMPLAZAR_PROJECT_ID",
+      storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+      messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+      appId:             "REEMPLAZAR_APP_ID"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -54,7 +53,11 @@
           timeout
         ]);
         div.className = "ok";
-        div.textContent = "✅ CONEXIÓN EXITOSA\n\nDatos recibidos:\n" + JSON.stringify(snap.data(), null, 2).slice(0, 500);
+        if(snap.exists){
+          div.textContent = "✅ CONEXIÓN EXITOSA — el documento existe\n\nDatos:\n" + JSON.stringify(snap.data(), null, 2).slice(0, 500);
+        } else {
+          div.textContent = "✅ CONEXIÓN EXITOSA — pero el documento 'data' no existe todavía en esta colección.\n\n(Esto es normal si es un proyecto nuevo. La conexión a Firestore SÍ funciona.)";
+        }
       }catch(e){
         div.className = "error";
         div.textContent = "❌ ERROR\n\nNombre: " + e.name + "\nCódigo: " + (e.code||"N/A") + "\nMensaje: " + e.message;
