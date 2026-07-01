@@ -1274,13 +1274,12 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
- apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-    authDomain: "rossdelune-64924.firebaseapp.com",
-    projectId: "rossdelune-64924",
-    storageBucket: "rossdelune-64924.firebasestorage.app",
-    messagingSenderId: "1084128115606",
-    appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-    measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1295,11 +1294,7 @@ let selectedColor = "#C8A8D0";
 // ══ FIRESTORE ══
 async function loadData(){
   const snap = await DOC_REF.get();
-  const result = snap.exists ? snap.data() : {};
-  // DEBUG TEMPORAL — borrar después
-  const debugEl = document.getElementById("login-err");
-  if(debugEl) debugEl.textContent = "FIRESTORE DATA: keys="+Object.keys(result).join(",")+" | users_type="+typeof result.users+" | users_length="+(Array.isArray(result.users)?result.users.length:"N/A");
-  return result;
+  return snap.exists ? snap.data() : {};
 }
 async function saveData(d){
   await DOC_REF.set(d);
@@ -1365,19 +1360,9 @@ async function doLogin(){
   try{
     const data=await loadData();
     allUsers=data.users||[];allClientes=data.clientes||[];window._invData=data.inventario||[];
-    err.style.color="#888";
-    err.textContent="DEBUG: usuarios encontrados="+allUsers.length+" | buscando u="+u+" role="+loginRole;
-    await new Promise(r=>setTimeout(r,2500));
     const match=allUsers.find(x=>x.user===u&&x.pass===p&&x.role===loginRole);
-    if(!match){
-      err.style.color="var(--rojo)";
-      err.textContent="DEBUG: no match. Usuarios en data: "+JSON.stringify(allUsers.map(x=>({user:x.user,role:x.role})));
-      btn.innerHTML="Entrar";btn.disabled=false;return;
-    }
+    if(!match){err.textContent="Usuario o contraseña incorrectos.";btn.innerHTML="Entrar";btn.disabled=false;return;}
     if(match.blocked){err.textContent="Cuenta bloqueada. Contacta al administrador.";btn.innerHTML="Entrar";btn.disabled=false;return;}
-    err.style.color="#888";
-    err.textContent="DEBUG: match encontrado, autenticando con Firebase Auth...";
-    await new Promise(r=>setTimeout(r,1500));
     const email = u+"@rossdelune.app";
     await auth.signInWithEmailAndPassword(email, p);
     const now=new Date().toLocaleString("es-MX",{timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
@@ -1386,11 +1371,7 @@ async function doLogin(){
     const idx=allUsers.findIndex(x=>x.user===u);allUsers[idx]=match;
     await saveData({...data,users:allUsers,clientes:allClientes});
     currentUser=match;closeLogin();enterPanel();
-  }catch(e){
-    err.style.color="var(--rojo)";
-    err.textContent="DEBUG ERROR: "+(e.code||e.name||"")+" — "+(e.message||e);
-    btn.innerHTML="Entrar";btn.disabled=false;
-  }
+  }catch(e){err.textContent="Error de conexión. Intenta de nuevo.";btn.innerHTML="Entrar";btn.disabled=false;}
 }
 
 // ══ PANEL ══
