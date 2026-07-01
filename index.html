@@ -1299,13 +1299,12 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
-  apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-    authDomain: "rossdelune-64924.firebaseapp.com",
-    projectId: "rossdelune-64924",
-    storageBucket: "rossdelune-64924.firebasestorage.app",
-    messagingSenderId: "1084128115606",
-    appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-    measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -2723,9 +2722,16 @@ async function guardarNotaPedido(clienteId, campo, valor){
 }
 
 // ══ LISTA "FORMATO DE AJUSTES" (submenú Progreso) ══
-function renderFormatoAjustesLista(){
+async function renderFormatoAjustesLista(){
   const lista = document.getElementById("formato-ajustes-lista");
   if(!lista) return;
+  lista.innerHTML = '<p style="color:#AAA;font-size:.82rem;padding:.5rem">Actualizando datos...</p>';
+  try{
+    const data = await loadData();
+    allClientes = data.clientes||[];
+  }catch(e){
+    toast("No se pudo actualizar, mostrando últimos datos","err");
+  }
   if(!allClientes.length){
     lista.innerHTML='<p style="color:#AAA;font-size:.82rem;padding:.5rem">Sin clientes.</p>';
     return;
@@ -2758,8 +2764,15 @@ function buildFormatoAjustesRow(c){
 }
 
 // ══ FORMATO DE AJUSTE IMPRIMIBLE (4 cuadrantes) ══
-function abrirFormatoAjuste(id){
-  const c = allClientes.find(x=>x.id===id);
+async function abrirFormatoAjuste(id){
+  let c = allClientes.find(x=>x.id===id);
+  try{
+    const data = await loadData();
+    allClientes = data.clientes||[];
+    c = allClientes.find(x=>x.id===id) || c;
+  }catch(e){
+    toast("No se pudo actualizar, mostrando últimos datos","err");
+  }
   if(!c) return;
   generarFormatoAjuste(c);
   document.getElementById("modal-ajustes").classList.add("open");
