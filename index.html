@@ -1274,13 +1274,12 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
-  apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-    authDomain: "rossdelune-64924.firebaseapp.com",
-    projectId: "rossdelune-64924",
-    storageBucket: "rossdelune-64924.firebasestorage.app",
-    messagingSenderId: "1084128115606",
-    appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-    measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1561,6 +1560,7 @@ const PKG_NOVIA=[
   {id:"ramo",      name:"Ramo",           opts:["Chico","Grande","Jumbo"],   default:"Chico"},
   {id:"corsage",   name:"Corsage",        opts:["Estándar","Grande","Jumbo"],default:"Estándar"},
   {id:"crinolina", name:"Crinolina",      opts:["Estándar","1 Olán","Maxi"], default:"Estándar"},
+  {id:"aro",       name:"Aro",            opts:["Básico","Maxi","Sin aro"],  default:"Básico"},
   {id:"velo",      name:"Velo bordado",   opts:["Corto","Largo","Mantilla"], default:"Corto"},
   {id:"ajustes",   name:"Ajustes",        opts:["Incluidos"],                default:"Incluidos"},
 ];
@@ -3887,9 +3887,6 @@ function generarContrato(c){
     </div>
   </div>
 </div>
-</body>
-</html>
-
 <!-- MODAL EDITAR CLIENTE -->
 <div class="overlay" id="modal-editar-cliente" style="align-items:flex-start;padding:1rem 0;overflow-y:auto">
   <div class="modal" style="max-width:520px;width:100%;margin:auto">
@@ -3980,3 +3977,5 @@ function generarContrato(c){
     <button class="btn-primary" onclick="guardarEdicionCliente()" id="btn-guardar-edicion" style="width:100%;margin-top:.5rem">💾 Guardar cambios</button>
   </div>
 </div>
+</body>
+</html>
