@@ -529,6 +529,7 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
       <div class="subnav" id="sub-progreso">
         <button class="sub-item" onclick="goSec('progreso-pedido')">🔄 Proceso pedido</button>
         <button class="sub-item" onclick="goSec('progreso-diseno')">✂️ Proceso diseño</button>
+        <button class="sub-item" onclick="goSec('progreso-formato')">🖨️ Formato de ajustes</button>
       </div>
     </div>
 
@@ -977,6 +978,20 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
       </div>
     </div>
 
+    <!-- ── FORMATO DE AJUSTES (imprimible) ── -->
+    <div class="section" id="sec-progreso-formato">
+      <div class="sec-title">Formato de Ajustes</div>
+      <div class="card" style="padding:.8rem 1rem">
+        <div class="proceso-header">
+          <div class="card-title" style="margin:0">Imprimir formato por cliente</div>
+          <input class="proceso-search" id="formato-search" placeholder="🔍 Buscar cliente..." oninput="filtrarFormatoAjustes(this.value)">
+        </div>
+        <div id="formato-ajustes-lista">
+          <p style="color:#AAA;font-size:.82rem;padding:.5rem">Cargando...</p>
+        </div>
+      </div>
+    </div>
+
     <!-- ── PROCESO DISEÑO (Elaboración propia) ── -->
     <div class="section" id="sec-progreso-diseno">
       <div class="sec-title">Proceso de Diseño</div>
@@ -1284,13 +1299,12 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
-  apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-    authDomain: "rossdelune-64924.firebaseapp.com",
-    projectId: "rossdelune-64924",
-    storageBucket: "rossdelune-64924.firebasestorage.app",
-    messagingSenderId: "1084128115606",
-    appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-    measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1497,6 +1511,7 @@ function goSec(id){
   }
   if(id==="progreso-pedido"){renderProceso();}
   if(id==="progreso-diseno"){renderDiseno();}
+  if(id==="progreso-formato"){renderFormatoAjustesLista();}
   if(id==="inv-qr"){renderInventario();}
   if(id==="inv-nuevo"){limpiarFormInv();}
   if(id==="nuevo-cliente"){limpiarFormularioCliente();}
@@ -2668,10 +2683,7 @@ function buildProcesoCard(c){
         <div class="proceso-nombre">${c.nombre}</div>
         <div class="proceso-meta">Folio ${c.folio||"—"} · ${c.tipo==="xv"?"Quinceañera":"Novia"} · ${c.modelo||"—"}</div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem">
-        <span class="status-badge ${c.estatus==="Entregado"?"s-entregado":c.estatus==="Recibido"?"s-recibido":"s-pedido"}">${c.estatus||"—"}</span>
-        <button class="btn-sec" style="font-size:.6rem;padding:.25rem .55rem" onclick="abrirFormatoAjuste('${c.id}')">🖨️ Formato</button>
-      </div>
+      <span class="status-badge ${c.estatus==="Entregado"?"s-entregado":c.estatus==="Recibido"?"s-recibido":"s-pedido"}">${c.estatus||"—"}</span>
     </div>
     <div style="margin-top:.5rem">${pasos}</div>
     <div class="proceso-entrega">📅 Entrega: <strong>${entrega}</strong></div>
@@ -2707,6 +2719,41 @@ async function guardarNotaPedido(clienteId, campo, valor){
   if(!allClientes[idx].progreso.pedido) allClientes[idx].progreso.pedido={};
   allClientes[idx].progreso.pedido[campo] = valor;
   await saveData({...data, users:allUsers, clientes:allClientes});
+}
+
+// ══ LISTA "FORMATO DE AJUSTES" (submenú Progreso) ══
+function renderFormatoAjustesLista(){
+  const lista = document.getElementById("formato-ajustes-lista");
+  if(!lista) return;
+  if(!allClientes.length){
+    lista.innerHTML='<p style="color:#AAA;font-size:.82rem;padding:.5rem">Sin clientes.</p>';
+    return;
+  }
+  lista.innerHTML = allClientes.map(c => buildFormatoAjustesRow(c)).join("");
+}
+
+function filtrarFormatoAjustes(q){
+  const lista = document.getElementById("formato-ajustes-lista");
+  if(!lista) return;
+  const txt = q.toLowerCase();
+  const filtrados = allClientes.filter(c =>
+    c.nombre.toLowerCase().includes(txt) || (c.folio||"").includes(txt)
+  );
+  if(!filtrados.length){
+    lista.innerHTML='<p style="color:#AAA;font-size:.82rem;padding:.5rem">Sin resultados.</p>';
+    return;
+  }
+  lista.innerHTML = filtrados.map(c => buildFormatoAjustesRow(c)).join("");
+}
+
+function buildFormatoAjustesRow(c){
+  return `<div class="proceso-card" style="display:flex;align-items:center;justify-content:space-between;gap:.6rem">
+    <div>
+      <div class="proceso-nombre">${c.nombre}</div>
+      <div class="proceso-meta">Folio ${c.folio||"—"} · ${c.tipo==="xv"?"Quinceañera":"Novia"} · ${c.modelo||"—"}</div>
+    </div>
+    <button class="paso-btn" onclick="abrirFormatoAjuste('${c.id}')">🖨️ Ver / Imprimir</button>
+  </div>`;
 }
 
 // ══ FORMATO DE AJUSTE IMPRIMIBLE (4 cuadrantes) ══
@@ -3050,7 +3097,7 @@ const SECCIONES_CTRL = [
   {id:"clientes",       label:"👗 Clientes",          subs:["nuevo-cliente","lista-clientes"]},
   {id:"pagos",          label:"💳 Pagos",              subs:["pagos-pendientes","historial-pagos","nota-sencilla","corte-caja"]},
   {id:"pedidos",        label:"📋 Pedidos",            subs:["todos-pedidos","entregas-fecha"]},
-  {id:"progreso",       label:"📦 Progreso",           subs:["progreso-pedido","progreso-diseno"]},
+  {id:"progreso",       label:"📦 Progreso",           subs:["progreso-pedido","progreso-diseno","progreso-formato"]},
   {id:"inventario",     label:"🏷️ Inventario",         subs:["inv-qr","inv-paquetes"]},
 ];
 
