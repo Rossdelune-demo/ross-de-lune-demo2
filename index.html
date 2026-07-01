@@ -399,18 +399,18 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
     align-items:center!important;justify-content:center!important;
   }
   #modal-qr-print.printing .no-print{display:none!important;}
-  #modal-contrato.open,#modal-nota.open,#modal-nota-sencilla.open,#modal-entrega.open{
+  #modal-contrato.open,#modal-nota.open,#modal-nota-sencilla.open,#modal-entrega.open,#modal-ajustes.open{
     display:block!important;position:fixed!important;
     inset:0!important;overflow:auto!important;
     background:#fff!important;z-index:9999!important;
   }
-  #modal-contrato.open>div,#modal-nota.open>div,#modal-nota-sencilla.open>div,#modal-entrega.open>div{
+  #modal-contrato.open>div,#modal-nota.open>div,#modal-nota-sencilla.open>div,#modal-entrega.open>div,#modal-ajustes.open>div{
     box-shadow:none!important;padding:.5cm!important;max-width:100%!important;
   }
-  #modal-contrato .no-print,#modal-nota .no-print,#modal-nota-sencilla .no-print,#modal-entrega .no-print{
+  #modal-contrato .no-print,#modal-nota .no-print,#modal-nota-sencilla .no-print,#modal-entrega .no-print,#modal-ajustes .no-print{
     display:none!important;
   }
-  #modal-contrato button,#modal-nota button,#modal-nota-sencilla button,#modal-entrega button,
+  #modal-contrato button,#modal-nota button,#modal-nota-sencilla button,#modal-entrega button,#modal-ajustes button,
   .no-print{display:none!important;}
   @page{margin:.4cm;size:letter portrait;}
   #contrato-content p{margin-bottom:3pt!important;margin-top:0!important;}
@@ -1267,6 +1267,16 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
   </div>
 </div>
 
+<!-- MODAL FORMATO DE AJUSTE -->
+<div class="overlay" id="modal-ajustes" style="z-index:300;align-items:flex-start;padding:0;overflow-y:auto">
+  <div style="background:#fff;width:100%;max-width:780px;margin:0 auto;padding:2rem;position:relative;min-height:100vh">
+    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;gap:.5rem;flex-wrap:wrap">
+      <button type="button" onclick="closeFormatoAjuste()" style="background:none;border:1px solid #DDD;padding:.4rem .9rem;border-radius:2px;cursor:pointer;font-size:.75rem;letter-spacing:.1em">✕ Cerrar</button>
+      <button type="button" onclick="imprimirAjuste()" style="background:var(--dorado-g);color:#FFF8EC;border:none;padding:.5rem 1.2rem;border-radius:2px;cursor:pointer;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+    <div id="ajustes-content"></div>
+  </div>
+</div>
 
 
 <script>
@@ -1274,13 +1284,12 @@ input[type="color"]{opacity:0;position:absolute;width:0;height:0;}
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
-  apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-    authDomain: "rossdelune-64924.firebaseapp.com",
-    projectId: "rossdelune-64924",
-    storageBucket: "rossdelune-64924.firebasestorage.app",
-    messagingSenderId: "1084128115606",
-    appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-    measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1568,7 +1577,7 @@ const PKG_NOVIA=[
 const PKG_CUSTOM=[
   {id:"ramo",      name:"Ramo",          opts:["Chico","Grande","Jumbo"],   default:""},
   {id:"corsage",   name:"Corsage",       opts:["Estándar","Grande","Jumbo"],default:""},
-  {id:"aro",       name:"Aro",           opts:["Básico","Maxi"],            default:""},
+  {id:"aro",       name:"Aro",           opts:["Básico","Maxi","Sin aro"],  default:""},
   {id:"tiara",     name:"Tiara",         opts:["Estándar","Grande"],        default:""},
   {id:"crinolina", name:"Crinolina",     opts:["Estándar","1 Olán","Maxi"],default:""},
   {id:"velo",      name:"Velo bordado",  opts:["Corto","Largo","Mantilla"],default:""},
@@ -2632,11 +2641,21 @@ function buildProcesoCard(c){
   const pasos = PASOS_PEDIDO.map(p => {
     const done = !!prog[p.id];
     const nota = prog[p.id+"_nota"]||"";
+    const fPrueba = prog[p.id+"_fechaPrueba"]||"";
+    const fTerm   = prog[p.id+"_fechaTerminado"]||"";
     return `<div class="paso-row">
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;flex-wrap:wrap">
         <button class="paso-btn ${done?"done":""}" onclick="togglePasoPedido('${c.id}','${p.id}')">
           <span class="paso-check">${done?"✓":"○"}</span>${p.label}
         </button>
+        <label style="font-size:.6rem;color:#AAA;display:flex;align-items:center;gap:.25rem">Prueba
+          <input type="date" value="${fPrueba}" style="font-size:.66rem;border:1px solid #E8DDD0;border-radius:2px;padding:.15rem .3rem"
+            onchange="guardarNotaPedido('${c.id}','${p.id}_fechaPrueba',this.value)">
+        </label>
+        <label style="font-size:.6rem;color:#AAA;display:flex;align-items:center;gap:.25rem">Terminado
+          <input type="date" value="${fTerm}" style="font-size:.66rem;border:1px solid #E8DDD0;border-radius:2px;padding:.15rem .3rem"
+            onchange="guardarNotaPedido('${c.id}','${p.id}_fechaTerminado',this.value)">
+        </label>
       </div>
       <textarea class="paso-nota-input" placeholder="Observaciones del ${p.label}..." rows="2"
         onblur="guardarNotaPedido('${c.id}','${p.id+"_nota"}',this.value)">${nota}</textarea>
@@ -2648,7 +2667,10 @@ function buildProcesoCard(c){
         <div class="proceso-nombre">${c.nombre}</div>
         <div class="proceso-meta">Folio ${c.folio||"—"} · ${c.tipo==="xv"?"Quinceañera":"Novia"} · ${c.modelo||"—"}</div>
       </div>
-      <span class="status-badge ${c.estatus==="Entregado"?"s-entregado":c.estatus==="Recibido"?"s-recibido":"s-pedido"}">${c.estatus||"—"}</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem">
+        <span class="status-badge ${c.estatus==="Entregado"?"s-entregado":c.estatus==="Recibido"?"s-recibido":"s-pedido"}">${c.estatus||"—"}</span>
+        <button class="btn-sec" style="font-size:.6rem;padding:.25rem .55rem" onclick="abrirFormatoAjuste('${c.id}')">🖨️ Formato</button>
+      </div>
     </div>
     <div style="margin-top:.5rem">${pasos}</div>
     <div class="proceso-entrega">📅 Entrega: <strong>${entrega}</strong></div>
@@ -2684,6 +2706,142 @@ async function guardarNotaPedido(clienteId, campo, valor){
   if(!allClientes[idx].progreso.pedido) allClientes[idx].progreso.pedido={};
   allClientes[idx].progreso.pedido[campo] = valor;
   await saveData({...data, users:allUsers, clientes:allClientes});
+}
+
+// ══ FORMATO DE AJUSTE IMPRIMIBLE (4 cuadrantes) ══
+function abrirFormatoAjuste(id){
+  const c = allClientes.find(x=>x.id===id);
+  if(!c) return;
+  generarFormatoAjuste(c);
+  document.getElementById("modal-ajustes").classList.add("open");
+  document.getElementById("modal-ajustes").scrollTop=0;
+}
+function closeFormatoAjuste(){document.getElementById("modal-ajustes").classList.remove("open");}
+function imprimirAjuste(){window.print();}
+
+function generarFormatoAjuste(c){
+  const prog = c.progreso?.pedido || {};
+  const tipos = {"xv":"Quinceañera","novia":"Novia"};
+  const colorBox = c.colorHex ? `<span style="display:inline-block;width:11px;height:11px;background:${c.colorHex};border:1px solid #CCC;border-radius:2px;vertical-align:middle;margin-right:4px"></span>` : "";
+  const fmtFecha = v => v ? new Date(v+"T12:00:00").toLocaleDateString("es-MX",{day:"2-digit",month:"2-digit",year:"2-digit"}) : "&nbsp;";
+
+  const filasPruebas = PASOS_PEDIDO.map((p,i)=>{
+    const no = i<3 ? (i+1)+"a" : "Entrega";
+    const done = prog[p.id] ? "✓" : "&nbsp;";
+    return `<tr>
+      <td style="border:1px solid #999;padding:.3rem .4rem;text-align:center;font-weight:600">${no}</td>
+      <td style="border:1px solid #999;padding:.3rem .4rem;text-align:center">${fmtFecha(prog[p.id+"_fechaPrueba"])}</td>
+      <td style="border:1px solid #999;padding:.3rem .4rem;text-align:center">${done}</td>
+      <td style="border:1px solid #999;padding:.3rem .4rem;text-align:center">${fmtFecha(prog[p.id+"_fechaTerminado"])}</td>
+    </tr>`;
+  }).join("");
+
+  const medidasRows = [["Busto",c.medidas?.busto],["Cintura",c.medidas?.cintura],["Cadera",c.medidas?.cadera],["Copa",c.medidas?.copa],["Largo",c.medidas?.largo]]
+    .map(([lab,val])=>`<tr><td style="border:1px solid #999;padding:.35rem .5rem;background:#FAFAFA;font-weight:600;width:45%">${lab}</td><td style="border:1px solid #999;padding:.35rem .5rem">${val||"&nbsp;"}</td></tr>`).join("");
+
+  const notas = PASOS_PEDIDO.map(p=>{
+    const nota = prog[p.id+"_nota"]||"";
+    return `<div style="border-bottom:1px dashed #CCC;padding:.35rem 0">
+      <div style="font-weight:700;font-size:7.5pt;color:#7A4F2A;margin-bottom:.15rem">${p.label}</div>
+      <div style="font-size:8.5pt;color:#333;min-height:12pt">${nota||"&nbsp;"}</div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("ajustes-content").innerHTML = `
+  <div style="font-family:Arial,sans-serif;color:#1a1a1a;line-height:1.35;max-width:720px;margin:0 auto;font-size:9pt;position:relative">
+
+    <!-- MARCA DE AGUA -->
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);opacity:.1;pointer-events:none;z-index:0">
+      <img src="logo_contrato.png" style="width:420px;height:auto">
+    </div>
+
+    <div style="position:relative;z-index:1">
+
+      <!-- ENCABEZADO -->
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5pt solid #C9A84C;padding-bottom:8pt;margin-bottom:8pt">
+        <div>
+          <div style="font-size:13pt;font-weight:700;color:#7A4F2A">ROSS DE LUNE</div>
+          <div style="font-size:7pt;color:#999;letter-spacing:.05em;margin-bottom:3pt">NOVIAS Y QUINCEAÑERAS</div>
+          <div style="font-size:11pt;font-weight:700">FORMATO DE AJUSTE</div>
+        </div>
+        <img src="logo_contrato.png" style="width:65pt;height:auto;flex-shrink:0">
+      </div>
+
+      <!-- DATOS DE LA PRENDA -->
+      <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-bottom:10pt">
+        <tr>
+          <td style="border:1px solid #999;padding:.3rem .5rem;background:#FAFAFA;font-weight:600;width:16%">Folio</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem;width:34%">${c.folio||"—"}</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem;background:#FAFAFA;font-weight:600;width:16%">Modelo</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem">${c.modelo||"—"}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #999;padding:.3rem .5rem;background:#FAFAFA;font-weight:600">Tipo de vestido</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem">${tipos[c.tipo]||"—"}</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem;background:#FAFAFA;font-weight:600">Color</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem">${colorBox}${c.colorNombre||c.colorHex||"—"}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #999;padding:.3rem .5rem;background:#FAFAFA;font-weight:600">Cliente</td>
+          <td style="border:1px solid #999;padding:.3rem .5rem" colspan="3">${c.nombre||"—"}</td>
+        </tr>
+      </table>
+
+      <!-- CUADRANTES SUPERIORES: MEDIDAS + PRUEBAS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10pt;margin-bottom:8pt">
+        <div>
+          <div style="font-weight:700;font-size:7.5pt;letter-spacing:.08em;text-transform:uppercase;color:#7A4F2A;margin-bottom:4pt">Medidas</div>
+          <table style="width:100%;border-collapse:collapse;font-size:8.5pt">${medidasRows}</table>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:7.5pt;letter-spacing:.08em;text-transform:uppercase;color:#7A4F2A;margin-bottom:4pt">Pruebas</div>
+          <table style="width:100%;border-collapse:collapse;font-size:8pt;text-align:center">
+            <tr style="background:#FAFAFA">
+              <td style="border:1px solid #999;padding:.25rem;font-weight:600">No.</td>
+              <td style="border:1px solid #999;padding:.25rem;font-weight:600">Fecha</td>
+              <td style="border:1px solid #999;padding:.25rem;font-weight:600">Terminado</td>
+              <td style="border:1px solid #999;padding:.25rem;font-weight:600">Fecha</td>
+            </tr>
+            ${filasPruebas}
+          </table>
+        </div>
+      </div>
+
+      <!-- NOTAS POR AJUSTE (divididas) -->
+      <div style="margin-bottom:10pt">
+        <div style="font-weight:700;font-size:7.5pt;letter-spacing:.08em;text-transform:uppercase;color:#7A4F2A;margin-bottom:4pt">Anotaciones por ajuste</div>
+        ${notas}
+      </div>
+
+      <!-- CUADRANTES INFERIORES: BOCETO + OBSERVACIONES -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10pt">
+        <div>
+          <div style="font-weight:700;font-size:7.5pt;letter-spacing:.08em;text-transform:uppercase;color:#7A4F2A;margin-bottom:4pt">Ajustes (boceto)</div>
+          <div style="border:1px solid #999;min-height:150pt;padding:4pt;position:relative;display:flex;align-items:center;justify-content:center">
+            <img src="boceto_figurin.jpg" style="max-width:100%;max-height:148pt;opacity:.55">
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:7.5pt;letter-spacing:.08em;text-transform:uppercase;color:#7A4F2A;margin-bottom:4pt">Observaciones</div>
+          <div style="border:1px solid #999;min-height:150pt;padding:6pt;font-size:8.5pt">${c.observaciones||"&nbsp;"}</div>
+        </div>
+      </div>
+
+      <!-- FIRMAS -->
+      <table style="width:100%;border-collapse:collapse;margin-top:20pt">
+        <tr>
+          <td style="width:45%;text-align:center;padding-top:30pt;border-top:1pt solid #1a1a1a">
+            <div style="font-size:8pt">Nombre de cliente</div>
+          </td>
+          <td style="width:10%"></td>
+          <td style="width:45%;text-align:center;padding-top:30pt;border-top:1pt solid #1a1a1a">
+            <div style="font-size:8pt">Firma de conformidad de cliente</div>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+  </div>`;
 }
 
 // ══ PROCESO DISEÑO (Elaboración propia) ══
