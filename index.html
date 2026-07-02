@@ -1303,17 +1303,17 @@ select.status-badge{border:none;cursor:pointer;appearance:none;-webkit-appearanc
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
-  apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-  authDomain: "rossdelune-64924.firebaseapp.com",
-  projectId: "rossdelune-64924",
-  storageBucket: "rossdelune-64924.firebasestorage.app",
-  messagingSenderId: "1084128115606",
-  appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-  measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db      = firebase.firestore();
+db.settings({experimentalForceLongPolling:true,merge:true});
 const auth    = firebase.auth();
 const DOC_REF = db.collection("rossdelune").doc("data");
 
@@ -3994,7 +3994,7 @@ function renderPedidos(){
   const tbody=document.getElementById("pedidos-tbody");
   if(!tbody)return;
   // Filtra solo los pendientes — "Pedido Realizado" o sin estatus
-  const pendientes=allClientes.filter(c=>!c.estatus||c.estatus==="Pedido Realizado"||c.estatus==="Pedido realizado");
+  const pendientes=allClientes.filter(c=>!c.estatus||c.estatus==="Pedido Realizado"||c.estatus==="Pedido realizado"||c.estatus==="En Compra");
   if(!pendientes.length){
     tbody.innerHTML='<tr><td colspan="11" style="color:#AAA;padding:1.5rem;text-align:center;">Sin pedidos pendientes 🎀</td></tr>';return;
   }
