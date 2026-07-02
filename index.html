@@ -1303,13 +1303,12 @@ select.status-badge{border:none;cursor:pointer;appearance:none;-webkit-appearanc
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
- apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-    authDomain: "rossdelune-64924.firebaseapp.com",
-    projectId: "rossdelune-64924",
-    storageBucket: "rossdelune-64924.firebasestorage.app",
-    messagingSenderId: "1084128115606",
-    appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-    measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1822,7 +1821,7 @@ function abrirEditarCliente(id){
   document.getElementById("edit-parcialidades").value= c.parcialidades||"30";
   document.getElementById("edit-fecha-limite").value = c.fechaLimite||"";
   document.getElementById("edit-entrega").value      = c.entrega||"";
-  document.getElementById("edit-estatus").value      = c.estatus||"En proceso";
+  document.getElementById("edit-estatus").value      = c.estatus||"Pedido Realizado";
   document.getElementById("edit-obs").value          = c.observaciones||"";
 
   editToggleParcialidades();
@@ -4227,7 +4226,9 @@ function generarContrato(c){
     <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--dorado-d);margin:.8rem 0 .5rem">Otros</div>
     <div class="field"><label>Estatus</label>
       <select id="edit-estatus">
-        <option value="En proceso">En proceso</option>
+        <option value="Pedido Realizado">Pedido Realizado</option>
+        <option value="En Compra">En Compra</option>
+        <option value="En Tienda">En Tienda</option>
         <option value="Recibido">Recibido</option>
         <option value="Entregado">Entregado</option>
       </select>
