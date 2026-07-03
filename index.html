@@ -1336,13 +1336,12 @@ select.status-badge{border:none;cursor:pointer;appearance:none;-webkit-appearanc
 // Reemplaza los valores REEMPLAZAR_* con tu firebaseConfig real
 // Firebase Console → ⚙️ Configuración del proyecto → Tus apps
 const firebaseConfig = {
-  apiKey: "AIzaSyDcvpixwsPrmme0pkB4YcwljkQ1tzOuGEk",
-  authDomain: "rossdelune-64924.firebaseapp.com",
-  projectId: "rossdelune-64924",
-  storageBucket: "rossdelune-64924.firebasestorage.app",
-  messagingSenderId: "1084128115606",
-  appId: "1:1084128115606:web:cf45a0165e063625567bb7",
-  measurementId: "G-27PHQ4PFRM"
+  apiKey:            "REEMPLAZAR_API_KEY",
+  authDomain:        "REEMPLAZAR_AUTH_DOMAIN",
+  projectId:         "REEMPLAZAR_PROJECT_ID",
+  storageBucket:     "REEMPLAZAR_STORAGE_BUCKET",
+  messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+  appId:             "REEMPLAZAR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -2698,7 +2697,6 @@ function buildProcesoCard(c){
     const done = !!prog[p.id];
     const nota = prog[p.id+"_nota"]||"";
     const fPrueba = prog[p.id+"_fechaPrueba"]||"";
-    const hPrueba = prog[p.id+"_horaPrueba"]||"";
     const fTerm   = prog[p.id+"_fechaTerminado"]||"";
     return `<div class="paso-row">
       <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;flex-wrap:wrap">
@@ -2712,12 +2710,6 @@ function buildProcesoCard(c){
         <label style="font-size:.6rem;color:#AAA;display:flex;align-items:center;gap:.25rem">Terminado
           <input type="date" value="${fTerm}" style="font-size:.66rem;border:1px solid #E8DDD0;border-radius:2px;padding:.15rem .3rem"
             onchange="guardarNotaPedido('${c.id}','${p.id}_fechaTerminado',this.value)">
-        </label>
-      </div>
-      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;flex-wrap:wrap">
-        <label style="font-size:.6rem;color:#AAA;display:flex;align-items:center;gap:.25rem">Hora
-          <input type="time" value="${hPrueba}" style="font-size:.66rem;border:1px solid #E8DDD0;border-radius:2px;padding:.15rem .3rem"
-            onchange="guardarNotaPedido('${c.id}','${p.id}_horaPrueba',this.value)">
         </label>
       </div>
       <textarea class="paso-nota-input" placeholder="Observaciones del ${p.label}..." rows="2"
@@ -2780,14 +2772,6 @@ function lunesDeSemana(fecha){
   return d;
 }
 
-function formatHora12(hhmm){
-  if(!hhmm) return "";
-  const [h,m] = hhmm.split(":").map(Number);
-  const ampm = h>=12 ? "PM" : "AM";
-  let h12 = h%12; if(h12===0) h12=12;
-  return `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
-}
-
 function fechaISO(d){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
@@ -2834,20 +2818,13 @@ function renderAgendaAjustes(){
       const prog = c.progreso?.pedido || {};
       PASOS_PEDIDO.forEach(p=>{
         const fPrueba = prog[p.id+"_fechaPrueba"] || "";
-        const hPrueba = prog[p.id+"_horaPrueba"] || "";
-        if(fPrueba === iso) citas.push({cliente:c, paso:p, hora:hPrueba});
+        if(fPrueba === iso) citas.push({cliente:c, paso:p});
       });
-    });
-    citas.sort((a,b)=>{
-      if(a.hora && b.hora) return a.hora.localeCompare(b.hora);
-      if(a.hora) return -1;
-      if(b.hora) return 1;
-      return 0;
     });
     const cuerpo = citas.length
       ? citas.map(ct=>`<div class="agenda-entry" onclick="irAClienteProceso('${ct.cliente.id}')">
           <div class="agenda-entry-paso">${ct.paso.label}</div>
-          <div class="agenda-entry-nombre">${ct.hora?formatHora12(ct.hora)+" · ":""}${ct.cliente.nombre}</div>
+          <div class="agenda-entry-nombre">${ct.cliente.nombre}</div>
         </div>`).join("")
       : '<div class="agenda-empty">Sin citas</div>';
     return `<div class="agenda-day ${iso===hoyISO?"hoy":""}">
